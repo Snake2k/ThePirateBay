@@ -150,7 +150,11 @@ class TPBFrame (wx.Frame):
         and queries it via TPB Api and fetches the results into
         the listctrl.
         '''
+        self._refreshlinks()
+        self.m_listCtrl1.DeleteAllItems()
+        self.m_listCtrl1.Refresh()
         itemsearched = self.searchCtrl.GetValue()
+        print itemsearched
         search = self.TheBay.search(itemsearched, 
                                     order = tpb.ORDERS.SEEDERS, 
                                     category = tpb.CATEGORIES.ALL)
