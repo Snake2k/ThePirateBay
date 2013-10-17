@@ -17,6 +17,7 @@ class TPBFrame (wx.Frame):
         self.page = None
         self.maglinks = []
         self.urllinks = []
+        self.currentitem = ""
 
         self.SetSizeHintsSz(wx.Size(450, 560), wx.Size(-1, -1))
         
@@ -131,6 +132,13 @@ class TPBFrame (wx.Frame):
         self.bUrlOpen.Disable()
         self.bDownload.Disable()
 
+        self.bNext.SetToolTipString("Go to the next search page.")
+        self.bPrev.SetToolTipString("Go to the previous search page.")
+        self.bUrlOpen.SetToolTipString("Visit the webpage " + \
+                                       "of the selected torrent.")
+        self.bDownload.SetToolTipString("Download the selected torrent.")
+        self.bSearch.SetToolTipString("Search for torrent links.")
+
         # Events
         self.searchCtrl.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self._search)
         self.searchCtrl.Bind(wx.EVT_TEXT_ENTER, self._search)
@@ -143,7 +151,7 @@ class TPBFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self._close, id = self.miClose.GetId())
         self.Bind(wx.EVT_MENU, self._showpref, id = self.miPref.GetId())
         self.Bind(wx.EVT_MENU, self._showabout, id = self.miAbout.GetId())
-    
+ 
     def _search(self, event):
         '''
         This method gets the text from the search ctrl
@@ -154,19 +162,22 @@ class TPBFrame (wx.Frame):
         self.m_listCtrl1.DeleteAllItems()
         self.m_listCtrl1.Refresh()
         itemsearched = self.searchCtrl.GetValue()
-        print itemsearched
-        search = self.TheBay.search(itemsearched, 
-                                    order = tpb.ORDERS.SEEDERS, 
-                                    category = tpb.CATEGORIES.ALL)
-        if self.page == None:
+        if self.page == None or self.currentitem != itemsearched:
             self.page = 1
             self.bNext.Enable()
             self.bDownload.Enable()
             self.bUrlOpen.Enable()
+            self.currentitem = itemsearched
         elif self.page == 1:
             self.bPrev.Disable()
         elif self.page > 1:
             self.bPrev.Enable()
+        search = self.TheBay.search(itemsearched, 
+                                    order = tpb.ORDERS.SEEDERS, 
+                                    category = tpb.CATEGORIES.ALL)
+        text = "Fetching results for \"%s\" (Page #%d)" % (itemsearched, 
+                                                           self.page)
+        self.statusBar.SetStatusText(text)
         for item in search.page(self.page):
             itemindex = self.m_listCtrl1.GetItemCount()
             self.m_listCtrl1.InsertStringItem(itemindex, str(item.title))
@@ -175,16 +186,16 @@ class TPBFrame (wx.Frame):
             self.m_listCtrl1.SetStringItem(itemindex, 3, str(item.leechers))
             self.maglinks.append(str(item.magnet_link))
             self.urllinks.append(str(item.url))
+        text = "Done. Displaying results for \"%s\" (Page #%d)" % (itemsearched,
+                                                                   self.page)
+        self.statusBar.SetStatusText(text)
 
     def _prevpage(self, event):
         '''
         Goes to the previous page if page number is not 1,
         else, it stays disabled.
         '''
-        self._refreshlinks()
         self.page -= 1
-        self.m_listCtrl1.DeleteAllItems()
-        self.m_listCtrl1.Refresh()
         self._search(event)
     
     def _nextpage(self, event):
@@ -192,10 +203,7 @@ class TPBFrame (wx.Frame):
         Goes to the next page if page number + 1 exists,
         else, is disabled.
         '''
-        self._refreshlinks()
         self.page += 1
-        self.m_listCtrl1.DeleteAllItems()
-        self.m_listCtrl1.Refresh()
         self._search(event)
 
     def _refreshlinks(self):
