@@ -11,8 +11,8 @@ class TPBFrame (wx.Frame):
         wx.Frame.__init__(self, parent, id = wx.ID_ANY, 
                           title = u"The Pirate Bay", pos = wx.DefaultPosition, 
                           size = wx.Size(450, 560), 
-                          style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
-        
+                          style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL)
+        self.SetIcon(wx.Icon("thepiratebaylogo.jpeg", wx.BITMAP_TYPE_JPEG))
         self.TheBay = tpb.TPB("https://www.thepiratebay.sx")
         self.page = None
         self.maglinks = []
