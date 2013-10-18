@@ -5,6 +5,7 @@ The class definition of ThePirateBayFrame (TPBFrame)
 import wx
 import tpb
 import webbrowser
+from urllib2 import URLError
 
 class TPBFrame (wx.Frame):
     def __init__(self, parent):
@@ -111,7 +112,8 @@ class TPBFrame (wx.Frame):
         
         self.mEdit = wx.Menu()
         self.miPref = wx.MenuItem(self.mEdit, wx.ID_ANY, 
-                                  u"Preferences", wx.EmptyString, wx.ITEM_NORMAL)
+                                  u"Preferences", wx.EmptyString, 
+                                  wx.ITEM_NORMAL)
         self.mEdit.AppendItem(self.miPref)
         
         self.menuBar.Append(self.mEdit, u"Edit") 
@@ -178,17 +180,29 @@ class TPBFrame (wx.Frame):
         text = "Fetching results for \"%s\" (Page #%d)" % (itemsearched, 
                                                            self.page)
         self.statusBar.SetStatusText(text)
-        for item in search.page(self.page):
-            itemindex = self.m_listCtrl1.GetItemCount()
-            self.m_listCtrl1.InsertStringItem(itemindex, str(item.title))
-            self.m_listCtrl1.SetStringItem(itemindex, 1, str(item.size))
-            self.m_listCtrl1.SetStringItem(itemindex, 2, str(item.seeders))
-            self.m_listCtrl1.SetStringItem(itemindex, 3, str(item.leechers))
-            self.maglinks.append(str(item.magnet_link))
-            self.urllinks.append(str(item.url))
-        text = "Done. Displaying results for \"%s\" (Page #%d)" % (itemsearched,
-                                                                   self.page)
-        self.statusBar.SetStatusText(text)
+        try:
+            for item in search.page(self.page):
+                itemindex = self.m_listCtrl1.GetItemCount()
+                self.m_listCtrl1.InsertStringItem(itemindex, 
+                                                  str(item.title))
+                self.m_listCtrl1.SetStringItem(itemindex, 1, 
+                                               str(item.size))
+                self.m_listCtrl1.SetStringItem(itemindex, 2, 
+                                               str(item.seeders))
+                self.m_listCtrl1.SetStringItem(itemindex, 3, 
+                                               str(item.leechers))
+                self.maglinks.append(str(item.magnet_link))
+                self.urllinks.append(str(item.url))
+            
+            text = "Done. Displaying results for \"%s\" (Page #%d)" \
+                   % (itemsearched, self.page)
+            self.statusBar.SetStatusText(text)
+        except URLError:
+            wx.MessageBox("Error occured while fetching results, " + 
+                          "please check your internet connection.",
+                          "Error", wx.OK | wx.ICON_ERROR)
+            text = "Error occured while fetching results."
+            self.statusBar.SetStatusText(text)
 
     def _prevpage(self, event):
         '''
@@ -282,6 +296,7 @@ class TPBFrame (wx.Frame):
         wx.MessageBox("The Unofficial Desktop Client for The Pirate Bay." + \
                       "\nImplemented using wxPython and " + \
                       "ThePirateBay API (Unofficial).\n" + \
-                      "Links:\nTPB API: https://github.com/thekarangoel/TPB" + \
+                      "Links:\nTPB API:" + \
+                      " https://github.com/thekarangoel/TPB" + \
                       "\nwxPython: http://www.wxpython.org/", "About",
                       wx.OK | wx.ICON_INFORMATION)
