@@ -12,7 +12,7 @@ class TPBFrame (wx.Frame):
                           title = u"The Pirate Bay", pos = wx.DefaultPosition, 
                           size = wx.Size(450, 560), 
                           style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL)
-        self.SetIcon(wx.Icon("thepiratebaylogo.jpeg", wx.BITMAP_TYPE_JPEG))
+        self.SetIcon(wx.Icon("thepiratebaylogo.png", wx.BITMAP_TYPE_PNG))
         self.TheBay = tpb.TPB("https://www.thepiratebay.sx")
         self.page = None
         self.maglinks = []
@@ -223,6 +223,7 @@ class TPBFrame (wx.Frame):
         self.bPrev.Disable()
         self.bDownload.Disable()
         self.bUrlOpen.Disable()
+        self.statusBar.SetStatusText("Application Cleared.")
     
     def _close(self, event):
         '''
