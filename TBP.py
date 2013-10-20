@@ -19,6 +19,8 @@ class TPBFrame (wx.Frame):
         self.maglinks = []
         self.urllinks = []
         self.currentitem = ""
+        self.currentorder = None
+        self.currentcategory = None
 
         self.SetSizeHintsSz(wx.Size(460, 560), wx.Size(-1, -1))
         
@@ -43,19 +45,30 @@ class TPBFrame (wx.Frame):
         
         bSizerChoices = wx.BoxSizer(wx.HORIZONTAL)
         
-        catComboBoxChoices = [u"Hey", u"Hi"]
+        catComboBoxChoices = [u"All", 
+                              u"Applications",
+                              u"Audio",
+                              u"Video",
+                              u"Games",
+                              u"Other"]
         self.catComboBox = wx.ComboBox(self.m_panel1, wx.ID_ANY, 
                                        u"Category", wx.DefaultPosition, 
                                        wx.DefaultSize, catComboBoxChoices, 0)
+        self.catComboBox.SetSelection(0)
         bSizerChoices.Add(self.catComboBox, 1, wx.ALL, 5)
         
-        ordComboBoxChoices = [u"Hey", u"Hi"]
+        ordComboBoxChoices = [u"Order by Seeders",
+                              u"Order by Leechers",
+                              u"Order by Size",
+                              u"Order by Type"]
         self.ordComboBox = wx.ComboBox(self.m_panel1, wx.ID_ANY, 
                                        u"Order By", wx.DefaultPosition, 
                                        wx.DefaultSize, ordComboBoxChoices, 0)
+        self.ordComboBox.SetSelection(0)
         bSizerChoices.Add(self.ordComboBox, 1, wx.ALL, 5)
         
         bSizer7 = wx.BoxSizer(wx.VERTICAL)
+
         self.bSearch = wx.Button(self.m_panel1, wx.ID_ANY, 
                                  u"Search", wx.DefaultPosition, 
                                  wx.DefaultSize, 0)
@@ -182,20 +195,33 @@ class TPBFrame (wx.Frame):
         self._refreshlinks()
         self.m_listCtrl1.DeleteAllItems()
         self.m_listCtrl1.Refresh()
+
+        thecategory = self._getcategory()
+        theorder = self._getorderby()
         itemsearched = self.searchCtrl.GetValue()
-        if self.page == None or self.currentitem != itemsearched:
+        if itemsearched == "":
+            wx.MessageBox("Please type the torrent you want to search.",
+                          "Error", wx.OK | wx.ICON_ERROR)
+            return False
+        if self.page == None or \
+           self.currentitem != itemsearched or \
+           self.currentcategory != thecategory or \
+           self.currentorder != theorder:
             self.page = 1
             self.bNext.Enable()
             self.bDownload.Enable()
             self.bUrlOpen.Enable()
             self.currentitem = itemsearched
+            self.currentcategory = thecategory
+            self.currentorder = theorder
         elif self.page == 1:
             self.bPrev.Disable()
         elif self.page > 1:
             self.bPrev.Enable()
+        print itemsearched, theorder, thecategory
         search = self.TheBay.search(itemsearched, 
-                                    order = tpb.ORDERS.SEEDERS, 
-                                    category = tpb.CATEGORIES.ALL)
+                                    order = theorder, 
+                                    category = thecategory)
         text = "Fetching results for \"%s\" (Page #%d)" % (itemsearched, 
                                                            self.page)
         self.statusBar.SetStatusText(text)
@@ -222,6 +248,42 @@ class TPBFrame (wx.Frame):
                           "Error", wx.OK | wx.ICON_ERROR)
             text = "Error occured while fetching results."
             self.statusBar.SetStatusText(text)
+
+    def _getorderby(self):
+        '''
+        Returns the order selected in the ordComboBox.
+        '''
+        order = self.ordComboBox.GetString(self.ordComboBox.GetSelection())
+        order = order[len("Order By "):]
+        if order == "Seeders":
+            return tpb.ORDERS.SEEDERS
+        elif order == "Leechers":
+            return tpb.ORDERS.LEECHERS
+        elif order == "Size":
+            return tpb.ORDERS.SIZE
+        elif order == "Type":
+            return tpb.ORDERS.TYPE
+    def _getcategory(self):
+        '''
+        Returns the category selected in the catComboBox.
+        '''
+        cat = self.catComboBox.GetString(self.catComboBox.GetSelection())
+        if cat == "All":
+            return tpb.CATEGORIES.ALL
+        elif cat == "Applications":
+            return tpb.CATEGORIES.APPLICATIONS
+        elif cat == "Audio":
+            return tpb.CATEGORIES.AUDIO
+        elif cat == "Video":
+            return tpb.CATEGORIES.VIDEO
+        elif cat == "Games":
+            return tpb.CATEGORIES.GAMES
+        elif cat == "Other":
+            return tpb.CATEGORIES.OTHER
+        else:
+            print "catComboBox error"
+            wx.MessageBox("Some next level stuff just happened.",
+                          "Error", wx.OK | wx.ICON_ERROR)
 
     def _prevpage(self, event):
         '''
