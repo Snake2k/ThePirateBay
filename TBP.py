@@ -11,7 +11,7 @@ class TPBFrame (wx.Frame):
     def __init__(self, parent):
         wx.Frame.__init__(self, parent, id = wx.ID_ANY, 
                           title = u"The Pirate Bay", pos = wx.DefaultPosition, 
-                          size = wx.Size(450, 560), 
+                          size = wx.Size(460, 560), 
                           style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL)
         self.SetIcon(wx.Icon("thepiratebaylogo.png", wx.BITMAP_TYPE_PNG))
         self.TheBay = tpb.TPB("https://www.thepiratebay.sx")
@@ -20,7 +20,7 @@ class TPBFrame (wx.Frame):
         self.urllinks = []
         self.currentitem = ""
 
-        self.SetSizeHintsSz(wx.Size(450, 560), wx.Size(-1, -1))
+        self.SetSizeHintsSz(wx.Size(460, 560), wx.Size(-1, -1))
         
         bSizer1 = wx.BoxSizer(wx.VERTICAL)
         
@@ -39,12 +39,31 @@ class TPBFrame (wx.Frame):
         bSizer3.Add(self.searchCtrl, 1, 
                     wx.ALIGN_CENTER_VERTICAL|wx.EXPAND|wx.ALL, 5)
         
+        bSizer2.Add(bSizer3, 0, wx.EXPAND, 5)
+        
+        bSizerChoices = wx.BoxSizer(wx.HORIZONTAL)
+        
+        catComboBoxChoices = [u"Hey", u"Hi"]
+        self.catComboBox = wx.ComboBox(self.m_panel1, wx.ID_ANY, 
+                                       u"Category", wx.DefaultPosition, 
+                                       wx.DefaultSize, catComboBoxChoices, 0)
+        bSizerChoices.Add(self.catComboBox, 1, wx.ALL, 5)
+        
+        ordComboBoxChoices = [u"Hey", u"Hi"]
+        self.ordComboBox = wx.ComboBox(self.m_panel1, wx.ID_ANY, 
+                                       u"Order By", wx.DefaultPosition, 
+                                       wx.DefaultSize, ordComboBoxChoices, 0)
+        bSizerChoices.Add(self.ordComboBox, 1, wx.ALL, 5)
+        
+        bSizer7 = wx.BoxSizer(wx.VERTICAL)
         self.bSearch = wx.Button(self.m_panel1, wx.ID_ANY, 
                                  u"Search", wx.DefaultPosition, 
                                  wx.DefaultSize, 0)
-        bSizer3.Add(self.bSearch, 0, wx.ALL, 5)
-        
-        bSizer2.Add(bSizer3, 0, wx.EXPAND, 5)
+        bSizer7.Add(self.bSearch, 0, wx.ALIGN_RIGHT|wx.RIGHT|wx.LEFT, 5)
+    
+        bSizerChoices.Add(bSizer7, 0, wx.ALIGN_CENTER_VERTICAL, 5)
+            
+        bSizer2.Add(bSizerChoices, 0, wx.EXPAND, 5)
         
         bSizer4 = wx.BoxSizer(wx.VERTICAL)
         
