@@ -2,7 +2,7 @@
 Main file for executing the GUI interface.
 '''
 import wx
-from TBP import TPBFrame
+from TheBay import TPBFrame
 
 if __name__ == '__main__':
     APP = wx.App()
