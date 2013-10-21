@@ -5,7 +5,7 @@ A GUI Front for The Pirate Bay using thekarangoel/TPB API and wxPython.
 
 Screenshot: 
 =======================================================================
-http://s10.postimg.org/pdlnl5imh/the_pirate_bay.png
+http://s24.postimg.org/jcijcw19x/The_Pirate_Bay.png
 
 How to use:
 =======================================================================
